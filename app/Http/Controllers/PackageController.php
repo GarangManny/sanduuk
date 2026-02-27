@@ -13,6 +13,7 @@ class PackageController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Package::class);
         return Inertia::render('Packages/Index', [
             'packages' => Package::latest()->get(),
         ]);
@@ -23,6 +24,7 @@ class PackageController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('manage', Package::class);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'speed_limit' => 'required|string',
@@ -32,7 +34,9 @@ class PackageController extends Controller
             'duration_unit' => 'required|string|in:day,month',
         ]);
 
-        Package::create($validated);
+        $package = Package::create($validated);
+
+        \App\Services\AuditService::log(auth()->id(), 'package.created', $package, null, $validated);
 
         return redirect()
             ->route('packages.index')
@@ -44,7 +48,10 @@ class PackageController extends Controller
      */
     public function destroy(Package $package)
     {
+        $this->authorize('manage', $package);
         $package->delete();
+
+        \App\Services\AuditService::log(auth()->id(), 'package.deleted', $package);
 
         return redirect()
             ->route('packages.index')

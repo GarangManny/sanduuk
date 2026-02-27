@@ -25,9 +25,9 @@ class AppServiceProvider extends ServiceProvider
         // If the request comes from an ngrok URL or has the HTTPS header,
         // force Laravel to generate HTTPS links for all assets (CSS, JS, Images).
         if (
-            $this->app->environment('local') && 
+            $this->app->environment('local') &&
             (
-                Request::header('x-forwarded-proto') === 'https' || 
+                Request::header('x-forwarded-proto') === 'https' ||
                 str_contains(Request::getHost(), 'ngrok-free.dev')
             )
         ) {

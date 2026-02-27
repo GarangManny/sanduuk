@@ -70,7 +70,7 @@ class MpesaController extends Controller
 
         if (isset($resData['ResponseCode']) && $resData['ResponseCode'] == '0') {
             Payment::create([
-                'user_id' => 1, // TODO: replace with authenticated user id (e.g. auth()->id())
+                'user_id' => auth()->id(),
                 'package_id' => $package->id,
                 'phone_number' => $phone,
                 'amount' => $amount,
@@ -116,7 +116,7 @@ class MpesaController extends Controller
             return response()->json(['ResultCode' => 1, 'ResultDesc' => 'Payment not found']);
         }
 
-        if ((int)$resultCode === 0) {
+        if ((int) $resultCode === 0) {
             // --- PAYMENT SUCCESS ---
 
             // Safaricom metadata can vary. We'll safely try to extract receipt code.
@@ -207,7 +207,7 @@ class MpesaController extends Controller
 
         // Optional sanity log:
         // Log::info("Subscription activated for User {$user->id}. Expires: {$expiresAt}");
-        
+
         // TODO: Trigger MikroTik API later
         // MikroTikService::enableUser($user->ip_address, $package->speed_profile);
     }

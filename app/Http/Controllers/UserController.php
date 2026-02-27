@@ -13,10 +13,14 @@ class UserController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', User::class);
+
         $users = User::where('role', 'user')
-            ->with(['subscription' => function ($query) {
-                $query->latest();
-            }])
+            ->with([
+                'subscription' => function ($query) {
+                    $query->latest();
+                }
+            ])
             ->latest()
             ->paginate(10);
 
@@ -30,6 +34,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        $this->authorize('manage', $user);
         // Load full history relationships
         $user->load([
             'subscriptions.package',
@@ -55,11 +60,16 @@ class UserController extends Controller
      */
     public function toggleStatus(User $user)
     {
+        $this->authorize('manage', $user);
+
+        $oldStatus = $user->status;
         $user->status = $user->status === 'active'
             ? 'suspended'
             : 'active';
 
         $user->save();
+
+        \App\Services\AuditService::log(auth()->id(), 'user.status_toggled', $user, ['status' => $oldStatus], ['status' => $user->status]);
 
         return back()->with('message', 'User status updated!');
     }

@@ -13,14 +13,15 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
-        'email',
+        // 'email',
         'password',
         'phone',
         'role',          // admin, user
         'status',        // active, suspended
-        'wifi_password', // new field
-        'mikrotik_ip',
+        //  'wifi_password', // new field
+        // 'mikrotik_ip',
         'username',
+        'balance',
     ];
 
     protected $hidden = [
@@ -64,4 +65,27 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class)->latest();
+    }
+
+    public function chamaMembership()
+    {
+        return $this->hasOne(\App\Models\ChamaMember::class);
+    }
+
+    public function chama()
+    {
+        return $this->hasOneThrough(
+            Chama::class,
+            ChamaMember::class,
+            'user_id',     // Foreign key on chama_members
+            'id',          // Foreign key on chamas
+            'id',          // Local key on users
+            'chama_id'     // Local key on chama_members
+        );
+    }
+
 }

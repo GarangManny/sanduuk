@@ -36,4 +36,10 @@ class HandleInertiaRequests extends Middleware
             ],
         ];
     }
+    protected function redirectTo($request)
+{
+    if (! $request->expectsJson()) {
+        return route('login'); // This is what triggers the "wants me to login" message
+    }
+}
 }

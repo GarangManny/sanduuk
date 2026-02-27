@@ -29,6 +29,8 @@ class AuthController extends Controller
             'status' => 'active',
         ]);
 
+        $user->load(['subscription.package', 'chama', 'transactions']);
+
         // Generate Token
         $token = $user->createToken('mobile-app')->plainTextToken;
 
@@ -55,6 +57,8 @@ class AuthController extends Controller
             ]);
         }
 
+        $user->load(['subscription.package', 'chama', 'transactions']);
+
         $token = $user->createToken('mobile-app')->plainTextToken;
 
         return response()->json([
@@ -67,7 +71,7 @@ class AuthController extends Controller
     // ✅ 3. GET USER PROFILE
     public function user(Request $request)
     {
-        return $request->user()->load(['subscription.package']);
+        return $request->user()->load(['subscription.package', 'chama', 'transactions']);
     }
 
     // ✅ 4. LOGOUT
